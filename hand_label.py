@@ -10,12 +10,11 @@ def hand_label(dir1, sub_list):
             if os.path.isdir(sub):
                 hand_dir = sub + '/hand/'
                 for d in os.listdir(hand_dir):
-                    if int(d) >= 240:
-                        in_dir = hand_dir + d
-                        if os.path.isdir(in_dir):
-                            print(in_dir[-5:])
-                            generate_label(in_dir, True)
-                            generate_label(in_dir, False)
+                    in_dir = hand_dir + d
+                    if os.path.isdir(in_dir):
+                        print(in_dir[-5:])
+                        generate_label(in_dir, True)
+                        generate_label(in_dir, False)
 
 
 def generate_label(in_dir, is_left):
