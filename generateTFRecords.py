@@ -78,12 +78,14 @@ def read_json(kp_labels):
             kp_positions[jid] = np.asarray(p)
             jid += 1
 
-    # dist_tri = np.zeros(210)
-    # for i in range(1, 21):
-    #     for j in range(i):
-    #         dist_tri[(i * (i - 1)) // 2 + j] = np.linalg.norm(kp_positions[i, :] - kp_positions[j, :])
-    kp_positions = kp_positions.reshape((42,))
-    return kp_positions
+    dist_tri = np.zeros(210)
+    for i in range(1, 21):
+        for j in range(i):
+            dist_tri[(i * (i - 1)) // 2 + j] = np.linalg.norm(kp_positions[i, :] - kp_positions[j, :])
+    dist_norm = np.linalg.norm(kp_positions[9, :] - kp_positions[0, :])
+    dist_tri = dist_tri/dist_norm
+    # kp_positions = kp_positions.reshape((42,))
+    return dist_tri
 
 
 def generate_record_from_dir(dir1, sub_list, record_path):
@@ -133,7 +135,7 @@ def generate_record_from_dir_kp(dir1, dir2, sub_list, record_path):
     for sub in os.listdir(dir1):
         if sub in sub_list:
             print(sub)
-            record_name = record_path + sub + '_kps_cord.tfrecord'
+            record_name = record_path + sub + '_kps.tfrecord'
             info_dir = dir2 + sub
             sub = dir1 + sub
             with tf.io.TFRecordWriter(record_name) as writer:
@@ -154,12 +156,12 @@ def generate_record_from_dir_kp(dir1, dir2, sub_list, record_path):
 
 
 def main():
-    dir1 = 'D:\Hand-data/HUMBI/Hand_1_80_updat/'
-    dir2 = 'D:\Hand-data/HUMBI/data/Hand_1_80_updat/'
-    # dir1 = 'D:\Hand-data/HUMBI/Hand_81_140_updat/'
-    # dir2 = 'D:\Hand-data/HUMBI/data/Hand_81_140_updat/'
-    sublist = ['subject_1', 'subject_2', 'subject_3', 'subject_4', 'subject_7']
-    record_path = 'D:\Hand-data/HUMBI/ds/'
+    # dir1 = 'D:\Hand-data/HUMBI/Hand_1_80_updat/'
+    # dir2 = 'D:\Hand-data/HUMBI/data/Hand_1_80_updat/'
+    dir1 = 'D:\Hand-data/HUMBI/Hand_81_140_updat/'
+    dir2 = 'D:\Hand-data/HUMBI/data/Hand_81_140_updat/'
+    sublist = ['subject_82','subject_88','subject_115','subject_118']
+    record_path = 'D:\Hand-data/HUMBI/ds_norm/'
     generate_record_from_dir_kp(dir1, dir2, sublist, record_path)
 
 

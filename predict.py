@@ -69,12 +69,12 @@ def predict_single_dir(path, path2, model, mode):
             input_list.append(im_rgb)
             with open(img[:-3] + 'json', 'r') as json_file:
                 info = json.load(json_file)
-            kpts = read_json(info)
-            kpts = kpts.reshape((21, 2))
-            dist_tri = np.zeros(210)
-            for i in range(1, 21):
-                for j in range(i):
-                    dist_tri[(i * (i - 1)) // 2 + j] = np.linalg.norm(kpts[i, :] - kpts[j, :])
+            dist_tri = read_json(info)
+            # kpts = kpts.reshape((21, 2))
+            # dist_tri = np.zeros(210)
+            # for i in range(1, 21):
+            #     for j in range(i):
+            #         dist_tri[(i * (i - 1)) // 2 + j] = np.linalg.norm(kpts[i, :] - kpts[j, :])
             dist_tri = dist_tri / 100
             info_list.append(dist_tri)
         # cv2.waitKey(0)
@@ -87,9 +87,8 @@ def predict_single_dir(path, path2, model, mode):
     for i in result:
         result_stat[i] += 1
     label_hat = np.argmax(result_stat)
-    if result_stat[label_hat] != len(input_list):
-        print(result_stat)
-        print(label)
+    print(result_stat)
+    print(label_hat)
     return label_hat, label
 
 
@@ -142,21 +141,20 @@ def predictor(in_dir, out_dir, model, sub_list, mode='normal'):
                             else:
                                 right += 1
                             total += 1
-
     print('total prediction: ' + str(total))
     print('right prediction: ' + str(right))
     print(right / total)
     print(wrong_list)
     save = False
     if save:
-        with open('error_info/test_info_dist.json', 'w') as file:
+        with open('error_info/img_kps_dist_labelsmooth0.1.json', 'w') as file:
             json.dump(wrong_list, file)
 
 
 def load_info():
     with open('error_info/info_dist.json', 'r') as file:
         info_list = json.load(file)
-    model = tf.keras.models.load_model('img_kps_dist.h5')
+    model = tf.keras.models.load_model('model/img_kps_dist.h5')
     for info in info_list:
         in_dir1 = info['name']
         in_dir2 = info['name'][0:19]+'data/'+info['name'][19:-19]+info['name'][-5:]
@@ -166,10 +164,11 @@ def load_info():
 
 
 def main():
-    in_dir = 'D:\Hand-data/HUMBI/data/Hand_1_80_updat'
-    out_dir = 'D:\Hand-data/HUMBI/Hand_1_80_updat'
-    subject_list = ['subject_1', 'subject_2', 'subject_3', 'subject_4', 'subject_7']
-    predictor(in_dir, out_dir, 'img_kps_dist_l2.h5', subject_list, 'kps')
+    in_dir = 'D:\Hand-data/HUMBI/data/Hand_81_140_updat'
+    out_dir = 'D:\Hand-data/HUMBI/Hand_81_140_updat'
+    subject_list = ['subject_88', 'subject_115', 'subject_118']
+    # subject_list = ['subject_1', 'subject_2', 'subject_3', 'subject_4', 'subject_7']
+    predictor(in_dir, out_dir, 'img_kps_dist_moredata_3.h5', subject_list, 'kps')
     # load_info()
 
 

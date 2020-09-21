@@ -74,9 +74,9 @@ def change(in_dir, is_left):
 
 
 def main():
-    dir1 = 'D:\Hand-data/HUMBI/Hand_81_140_updat/'
+    dir1 = 'D:\Hand-data/HUMBI/Hand_1_80_updat/'
     # sublist = ['subject_1', 'subject_2', 'subject_3']
-    sublist = ['subject_115']
+    sublist = ['subject_9']
     hand_label(dir1, sublist)
 
 
