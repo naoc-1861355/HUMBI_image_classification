@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import os
 import json
-from generateTFRecords import read_json
+from generateTFRecords import read_json, generate_jcd
 
 
 def predict_single_dir(path, path2, model, mode):
@@ -60,8 +60,6 @@ def predict_single_dir(path, path2, model, mode):
         info_list = []
         for img in img_list:
             im = cv2.imread(img)
-            # cv2.imshow('1',im)
-            # cv2.waitKey(50)
             im_rgb = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
             im_rgb = im_rgb.astype(float)
             im_rgb = tf.image.resize(im_rgb, [224, 224])
@@ -70,15 +68,8 @@ def predict_single_dir(path, path2, model, mode):
             with open(img[:-3] + 'json', 'r') as json_file:
                 info = json.load(json_file)
             dist_tri = read_json(info)
-            # kpts = kpts.reshape((21, 2))
-            # dist_tri = np.zeros(210)
-            # for i in range(1, 21):
-            #     for j in range(i):
-            #         dist_tri[(i * (i - 1)) // 2 + j] = np.linalg.norm(kpts[i, :] - kpts[j, :])
-            dist_tri = dist_tri / 100
+            dist_tri = generate_jcd(dist_tri)
             info_list.append(dist_tri)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
         input_img = np.array(input_list)
         input_kps = np.array(info_list)
         result = model.predict((input_img, input_kps))
@@ -145,9 +136,9 @@ def predictor(in_dir, out_dir, model, sub_list, mode='normal'):
     print('right prediction: ' + str(right))
     print(right / total)
     print(wrong_list)
-    save = False
+    save = True
     if save:
-        with open('error_info/img_kps_dist_labelsmooth0.1.json', 'w') as file:
+        with open('error_info/img_kps_dist_morefc.json', 'w') as file:
             json.dump(wrong_list, file)
 
 
@@ -168,7 +159,7 @@ def main():
     out_dir = 'D:\Hand-data/HUMBI/Hand_81_140_updat'
     subject_list = ['subject_88', 'subject_115', 'subject_118']
     # subject_list = ['subject_1', 'subject_2', 'subject_3', 'subject_4', 'subject_7']
-    predictor(in_dir, out_dir, 'img_kps_dist_moredata_3.h5', subject_list, 'kps')
+    predictor(in_dir, out_dir, 'img_kps_dist_morefc_2.h5', subject_list, 'kps')
     # load_info()
 
 

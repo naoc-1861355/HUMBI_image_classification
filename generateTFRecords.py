@@ -3,6 +3,7 @@ import os
 import json
 import tensorflow as tf
 import numpy as np
+from utils import generate_heatmap, read_json, generate_jcd
 
 
 def generate_record_example(in_path, writer):
@@ -65,27 +66,26 @@ def generate_record_example_with_kp(in_path, info_path, writer):
         writer.write(example_proto.SerializeToString())
 
 
-def read_json(kp_labels):
-    kp_positions = np.zeros((21, 2), dtype='float32')
-    # read ezxr_render json label
-    ps = [kp_labels['f52'][0]['x'] + 0.5, kp_labels['f52'][0]['y'] + 0.5]
-    kp_positions[0] = np.asarray(ps)
-    jid = 1
-    for fid in range(5):
-        ps = kp_labels['f%d2' % fid]
-        for i in range(4):
-            p = [ps[i]['x'] + .5, ps[i]['y'] + 0.5]
-            kp_positions[jid] = np.asarray(p)
-            jid += 1
-
-    dist_tri = np.zeros(210)
-    for i in range(1, 21):
-        for j in range(i):
-            dist_tri[(i * (i - 1)) // 2 + j] = np.linalg.norm(kp_positions[i, :] - kp_positions[j, :])
-    dist_norm = np.linalg.norm(kp_positions[9, :] - kp_positions[0, :])
-    dist_tri = dist_tri/dist_norm
-    # kp_positions = kp_positions.reshape((42,))
-    return dist_tri
+def generate_record_example_with_heatmap(in_path, info_path, writer):
+    train = glob.glob(in_path + '/*.png')
+    label = in_path + '/label.txt'
+    with open(label) as file:
+        file_content = file.read()
+        label = int(file_content)
+    for image in train:
+        img = open(image, 'rb').read()
+        json_file = open(info_path + image[-17:-3] + 'json', 'r')
+        # info = json.load(json_file)
+        # joints = read_json(info)
+        # heatmap = generate_heatmap(joints, 20, 8.0)
+        json_name = info_path + image[-17:-3] + 'json'
+        feature = {
+            "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[label])),
+            'img_raw': tf.train.Feature(bytes_list=tf.train.BytesList(value=[img])),
+            'json_name': tf.train.Feature(bytes_list=tf.train.BytesList(value=[json_name.encode()]))
+        }
+        example_proto = tf.train.Example(features=tf.train.Features(feature=feature))
+        writer.write(example_proto.SerializeToString())
 
 
 def generate_record_from_dir(dir1, sub_list, record_path):
@@ -150,18 +150,21 @@ def generate_record_from_dir_kp(dir1, dir2, sub_list, record_path):
                         inpath_2 = os.path.join(in_dir, 'image_cropped', 'right')
                         info_path_2 = os.path.join(indir_2, 'right')
                         if os.path.exists(inpath_1 + '/label.txt'):
-                            generate_record_example_with_kp(inpath_1, info_path_1, writer)
+                            # generate_record_example_with_kp(inpath_1, info_path_1, writer)
+                            generate_record_example_with_heatmap(inpath_1, info_path_1, writer)
                         if os.path.exists(inpath_2 + '/label.txt'):
-                            generate_record_example_with_kp(inpath_2, info_path_2, writer)
+                            # generate_record_example_with_kp(inpath_2, info_path_2, writer)
+                            generate_record_example_with_heatmap(inpath_2, info_path_2, writer)
 
 
 def main():
-    # dir1 = 'D:\Hand-data/HUMBI/Hand_1_80_updat/'
-    # dir2 = 'D:\Hand-data/HUMBI/data/Hand_1_80_updat/'
-    dir1 = 'D:\Hand-data/HUMBI/Hand_81_140_updat/'
-    dir2 = 'D:\Hand-data/HUMBI/data/Hand_81_140_updat/'
-    sublist = ['subject_82','subject_88','subject_115','subject_118']
-    record_path = 'D:\Hand-data/HUMBI/ds_norm/'
+    dir1 = 'D:\Hand-data/HUMBI/Hand_1_80_updat/'
+    dir2 = 'D:\Hand-data/HUMBI/data/Hand_1_80_updat/'
+    # dir1 = 'D:\Hand-data/HUMBI/Hand_81_140_updat/'
+    # dir2 = 'D:\Hand-data/HUMBI/data/Hand_81_140_updat/'
+    # sublist = ['subject_82', 'subject_88', 'subject_115', 'subject_118']
+    sublist = ['subject_1', 'subject_2', 'subject_3', 'subject_4', 'subject_7', 'subject_9','subject_11']
+    record_path = 'D:\Hand-data/HUMBI/ds_heatmap/'
     generate_record_from_dir_kp(dir1, dir2, sublist, record_path)
 
 

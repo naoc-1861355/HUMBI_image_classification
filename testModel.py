@@ -119,7 +119,7 @@ def stat_predict_kps(ds, model):
     stat = np.zeros((18, 18))
     for img, kps, label in ds:
         label = label.numpy()
-        result = model.predict((img,kps/100))
+        result = model.predict((img,kps))
         result = np.argmax(result, axis=1)
         for i in range(label.shape[0]):
             stat[label[i], result[i]] += 1
@@ -143,31 +143,29 @@ def viz_pred_kps(ds_kp, model):
 
 
 def main():
-    model = tf.keras.models.load_model('model/img_kps_dist.h5')
+    model = tf.keras.models.load_model('img_kps_dist_norm.h5')
 
-    record_path = 'D:\Hand-data/HUMBI/ds/'
+    record_path = 'D:\Hand-data/HUMBI/ds_heatmap/'
 
     ds_kp = readTfRecords_info([record_path + 'subject_1_kps.tfrecord', record_path + 'subject_2_kps.tfrecord',
                                 record_path + 'subject_3_kps.tfrecord', record_path + 'subject_4_kps.tfrecord',
                                 record_path + 'subject_7_kps.tfrecord', record_path + 'subject_82_kps.tfrecord'], 32,
                                224, 'kps', True)
     val_ds_kp = readTfRecords_info([record_path + 'subject_88_kps.tfrecord', record_path + 'subject_115_kps.tfrecord',
-                                    record_path + 'subject_118_kps.tfrecord'], 16, 224, 'kps', False)
-
-    stat_mat = stat_predict(val_ds_kp, model)
-    print(stat_mat)
-    num = np.sum(stat_mat, axis=1)
-    confusion_matrix = stat_mat/num
-    print(confusion_matrix)
-    # viz_predict(val_ds,model)
-    # print(stat_mat)
-    # print(np.sum(stat_mat, axis=1))
-    # mat = np.zeros((18))
-    # for i in range(18):
-    #     mat[i] = stat_mat[i,i]/(np.sum(stat_mat,axis=1)[i]+1)
-    # print(mat)
-    # viz_ds(ds2)
-    #
+                                    record_path + 'subject_118_kps.tfrecord'], 16, 224, 'heat_map', False)
+    heatmap_model = tf.keras.applications.MobileNetV2(input_shape=(250, 250, 21), include_top=False, weights=None)
+    heatmap_model.summary()
+    for (image, heatmap), label in val_ds_kp:
+        print(image.shape)
+        print(label)
+        heatmap = heatmap.numpy()[2]
+        print(heatmap.shape)
+        break
+    # stat_mat = stat_predict_kps(val_ds_kp, model)
+    # print(stat_mat)left_kp_2d
+    # num = np.sum(stat_mat, axis=1)
+    # confusion_matrix = stat_mat/num
+    # print(confusion_matrix)
     # model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
     #               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
     #               metrics=['sparse_categorical_accuracy'])
