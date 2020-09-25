@@ -1,5 +1,6 @@
 # HUMBI_image_classification
-This repository contains code for training and prediction for hand pose classification based on HUMBI dataset
+This repository contains code for training and prediction for hand pose classification based on HUMBI dataset.
+The work is based on tensorflow.
 
 ## HandPose labels
 All labels of training and prediction labels are made using provided code.
