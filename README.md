@@ -2,8 +2,9 @@
 This repository contains code for training and prediction for hand pose classification based on HUMBI dataset
 
 ## HandPose labels
-All labels of training and prediction labels are made using provided code
-There are 18 categories totol
+All labels of training and prediction labels are made using provided code.
+There are total 18 categories as below.
+[image](https://github.com/naoc-1861355/HUMBI_image_classification/blob/master/img/label.png)
 
 ## Model
 ### RGB model
