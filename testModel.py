@@ -143,7 +143,7 @@ def viz_pred_kps(ds_kp, model):
 
 
 def main():
-    model = tf.keras.models.load_model('img_kps_dist_norm.h5')
+    model = tf.keras.models.load_model('model/img_kps_dist_norm.h5')
 
     record_path = 'D:\Hand-data/HUMBI/ds_heatmap/'
 
