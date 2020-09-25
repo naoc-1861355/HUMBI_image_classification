@@ -145,22 +145,19 @@ def viz_pred_kps(ds_kp, model):
 def main():
     model = tf.keras.models.load_model('model/img_kps_dist_norm.h5')
 
-    record_path = 'D:\Hand-data/HUMBI/ds_heatmap/'
+    record_path = 'D:\Hand-data/HUMBI/ds_norm/'
 
     ds_kp = readTfRecords_info([record_path + 'subject_1_kps.tfrecord', record_path + 'subject_2_kps.tfrecord',
                                 record_path + 'subject_3_kps.tfrecord', record_path + 'subject_4_kps.tfrecord',
                                 record_path + 'subject_7_kps.tfrecord', record_path + 'subject_82_kps.tfrecord'], 32,
                                224, 'kps', True)
     val_ds_kp = readTfRecords_info([record_path + 'subject_88_kps.tfrecord', record_path + 'subject_115_kps.tfrecord',
-                                    record_path + 'subject_118_kps.tfrecord'], 16, 224, 'heat_map', False)
-    heatmap_model = tf.keras.applications.MobileNetV2(input_shape=(250, 250, 21), include_top=False, weights=None)
-    heatmap_model.summary()
-    for (image, heatmap), label in val_ds_kp:
-        print(image.shape)
-        print(label)
-        heatmap = heatmap.numpy()[2]
-        print(heatmap.shape)
-        break
+                                    record_path + 'subject_118_kps.tfrecord'], 16, 224, 'kps', False)
+    stat_mat = stat_predict_kps(val_ds_kp, model)
+    print(stat_mat)
+    num = np.sum(stat_mat, axis=1)
+    confusion_matrix = stat_mat/num
+    print(confusion_matrix)
 
 
 if __name__ == '__main__':
