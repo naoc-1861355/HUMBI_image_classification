@@ -161,19 +161,6 @@ def main():
         heatmap = heatmap.numpy()[2]
         print(heatmap.shape)
         break
-    # stat_mat = stat_predict_kps(val_ds_kp, model)
-    # print(stat_mat)left_kp_2d
-    # num = np.sum(stat_mat, axis=1)
-    # confusion_matrix = stat_mat/num
-    # print(confusion_matrix)
-    # model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
-    #               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-    #               metrics=['sparse_categorical_accuracy'])
-    # model.fit(ds_kp, epochs=10, validation_data=val_ds_kp, callbacks=[
-    #     tf.keras.callbacks.TensorBoard(log_dir='logs/img_kps_fintune',
-    #                                    profile_batch=100000000)])
-    # model.evaluate(ds_kp)
-    # model.save('img_kps_finetune.h5', save_format='h5')
 
 
 if __name__ == '__main__':

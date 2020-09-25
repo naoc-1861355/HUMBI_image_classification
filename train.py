@@ -152,7 +152,6 @@ def main():
                             'heat_map', True)
     val_ds = readTfRecords_info([record_path + 'subject_88_kps.tfrecord', record_path + 'subject_115_kps.tfrecord',
                                  record_path + 'subject_118_kps.tfrecord'], 16, 224, 'heat_map', False)
-    # 32 batch_size without augment: 366 batches total
     # model = load_model_mobilenet_kps()
     # model = load_model_kps()
     # model = load_model_mobilenet_heatmap()
